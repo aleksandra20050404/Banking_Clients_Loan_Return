@@ -247,63 +247,52 @@ Same row count as Total Clients but scoped to the `Joined Bank` date slicer cont
 - *Bank Deposits by Age (scatter)* — Deposit concentration increases with age, with the largest balances held by clients aged 50–80
 - *Gender toggle* — Enables side-by-side comparison of deposit behaviour between male and female clients
 
-#### DAX Measures — Page 2
+#### DAX Measures — Page 
 
-**Total Deposits** *(page-scoped)*
+---
+
 ```dax
 Total Deposits = SUM('banking-clients'[Bank Deposits])
 ```
 Same measure as Page 1 but on this page the filter context is narrowed by the Occupation and Income Category slicers, so the $996M KPI card reflects the filtered deposit pool rather than the full $2.01bn portfolio total.
 
 ---
-
-**Total Savings Accounts**
 ```dax
 Total Savings Accounts = SUM('banking-clients'[Saving Accounts])
 ```
 Sums the `Saving Accounts` balance column across all clients in the current filter context. Displayed as a KPI card ($353.04M) and plotted on the Account Balances over Time line chart.
 
 ---
-
-**Foreign Currency Accounts**
 ```dax
 Foreign Currency Accounts = SUM('banking-clients'[Foreign Currency Account])
 ```
 Aggregates the `Foreign Currency Account` balance for all filtered clients. Shown as a KPI card ($44.63M) and as the third series on the Account Balances over Time line chart.
-
 ---
 
-**Avg Checking Accounts**
 ```dax
 Avg Checking Accounts = AVERAGE('banking-clients'[Checking Accounts])
 ```
 Returns the mean checking account balance per client ($319.16K). Used as a KPI card and as the primary series on the Account Balances over Time line chart, where it is aggregated by year using the `Joined Bank` date hierarchy.
 
 ---
-
-**Avg Saving Accounts**
 ```dax
 Avg Saving Accounts = AVERAGE('banking-clients'[Saving Accounts])
 ```
 Mean savings account balance per client ($237.26K). Appears as a KPI card alongside `Avg Checking Accounts`.
 
 ---
-
-**Avg Estimated Income** *(Deposits page context)*
 ```dax
 Avg Estimated Income = AVERAGE('banking-clients'[Estimated Income])
 ```
 Reused from Page 1. On this page it is plotted against `Bank Deposits` by `Loyalty Classification` in the scatter chart, revealing income-to-deposit ratios across Jade, Silver, Gold, and Platinum tiers.
 
 ---
-
-**Total Superannuation Savings**
 ```dax
 Total Superannuation Savings = SUM('banking-clients'[Superannuation Savings])
 ```
 Sums superannuation balances, used as the value axis in the Superannuation Savings by Occupation horizontal bar chart. The Occupation field groups rows natively from the source data — no additional DAX grouping is required.
-
 ---
+
 
 ### Page 3 — Loan & Lending
 
@@ -317,32 +306,25 @@ Sums superannuation balances, used as the value axis in the Superannuation Savin
 - *Client Risk Table* — Drillable table showing Name, Risk Category, Total Loans, and Business Lending for individual client review
 
 #### DAX Measures — Page 3
-
-**Total Loans** *(Lending page context)*
 ```dax
 Total Loans = SUM('banking-clients'[Bank Loans])
 ```
 Reused core measure. On this page filtered by Investment Advisor and Risk Category slicers, producing the $210.18M KPI card value. Also plotted as a time series on the Loans vs. Business Lending line chart.
-
 ---
 
-**Total Business Lending**
 ```dax
 Total Business Lending = SUM('banking-clients'[Business Lending])
 ```
 Sums the `Business Lending` column across all clients in context ($310.8M). Appears as a KPI card and as the second series on the Loans vs. Business Lending over Time line chart.
 
 ---
-
-**Total Credit Card Balance**
 ```dax
 Total Credit Card Balance = SUM('banking-clients'[Credit Card Balance])
 ```
+
 Aggregates `Credit Card Balance` across all filtered clients. Shown as a standalone KPI card ($1.14M). The low value relative to loans confirms most credit exposure is driven by bank and business lending rather than revolving credit.
 
 ---
-
-**% High Risk Clients**
 ```dax
 % High Risk Clients =
 DIVIDE(
@@ -351,11 +333,10 @@ DIVIDE(
     0
 )
 ```
-Counts clients where the engineered `RiskCategory` column equals "High" (Risk Weighting = 4), divides by total client count, and returns the percentage (7.4%). `DIVIDE` is used instead of `/` to return 0 rather than an error if the denominator is zero after filtering.
 
+Counts clients where the engineered `RiskCategory` column equals "High" (Risk Weighting = 4), divides by total client count, and returns the percentage (7.4%). `DIVIDE` is used instead of `/` to return 0 rather than an error if the denominator is zero after filtering.
 ---
 
-**Avg Risk Weighting**
 ```dax
 Avg Risk Weighting = AVERAGE('banking-clients'[Risk Weighting])
 ```
@@ -363,7 +344,6 @@ Returns the mean numerical risk score (1–5) across all clients in the current 
 
 ---
 
-**Total Properties Owned**
 ```dax
 Total Properties Owned = SUM('banking-clients'[Properties Owned])
 ```
@@ -371,7 +351,6 @@ Sums the `Properties Owned` column across all clients (520 total). Used as a KPI
 
 ---
 
-**Avg Bank Loans**
 ```dax
 Avg Bank Loans = AVERAGE('banking-clients'[Bank Loans])
 ```
@@ -416,111 +395,7 @@ Mean loan balance per client. Plotted as the bar series on the combo chart broke
 
 
 
-## Measures — Home Folder
+ 
 
-```dax
-Total Clients = DISTINCTCOUNT(final_data[Client_ID])
-```
 
-```dax
-Total Deposits = SUM(final_data[Bank_Deposits])
-```
 
-```dax
-Total Loans = SUM(final_data[Bank_Loans])
-```
-
-```dax
-Total Credit Card Balance = SUM(final_data[Credit_Card_Balance])
-```
-
-```dax
-Total Superannuation = SUM(final_data[Superannuation_Savings])
-```
-
-```dax
-Avg Estimated Income = AVERAGE(final_data[Estimated_Income])
-```
-
-```dax
-Clients Joined (Selected Period) = CALCULATE([Total Clients])
-```
-
-```dax
-% of Total Clients =
-DIVIDE([Total Clients], CALCULATE([Total Clients], ALL(final_data)))
-```
-
-```dax
-Client Growth YoY =
-VAR CurrentYearClients = [Total Clients]
-VAR PriorYearClients = CALCULATE([Total Clients], SAMEPERIODLASTYEAR(DimDate[Date]))
-RETURN DIVIDE(CurrentYearClients - PriorYearClients, PriorYearClients)
-```
-
----
-
-## Measures — Loan Folder
-
-```dax
-Total Business Lending = SUM(final_data[Business_Lending])
-```
-
-```dax
-Avg Risk Weighting = AVERAGE(final_data[Risk_Weighting])
-```
-
-```dax
-Total Properties Owned = SUM(final_data[Properties_Owned])
-```
-
-```dax
-Avg Credit Cards Held = AVERAGE(final_data[Amount_of_Credit_Cards])
-```
-
-```dax
-% High Risk Clients =
-DIVIDE(CALCULATE([Total Clients], final_data[RiskCategory] = "Very High"), [Total Clients])
-```
-
----
-
-## Measures — Deposits Folder
-
-```dax
-Total Savings Accounts = SUM(final_data[Saving_Accounts])
-```
-
-```dax
-Total Checking Accounts = SUM(final_data[Checking_Accounts])
-```
-
-```dax
-Total Foreign Currency = SUM(final_data[Foreign_Currency_Account])
-```
-
----
-
-## Format Strings Applied (for reference when rebuilding manually)
-
-| Measure | Format String |
-|---|---|
-| Total Clients, Total Properties Owned | `#,##0` |
-| Total Deposits, Total Loans, Total Credit Card Balance, Total Business Lending, Total Savings Accounts, Total Checking Accounts, Total Foreign Currency, Total Superannuation | `$#,##0,,"M"` |
-| Avg Estimated Income | `$#,##0` |
-| Avg Risk Weighting, Avg Credit Cards Held | `0.0` |
-| Clients Joined (Selected Period) | `#,##0` |
-| % of Total Clients, % High Risk Clients, Client Growth YoY | `0.0%` |
-
----
-
-## Not Rebuilt as DAX (already existed in your source data)
-`IncomeCategory` and `RiskCategory` were already derived columns present in `final_data` when I first connected — I didn't recreate these, so their formulas aren't listed here. If you want their exact expressions, I can pull those from the model too — just say the word.
-
----
-
-## How to Recreate Any of These Manually
-1. **Home** ribbon or **Modeling** ribbon → **New measure**.
-2. Type the formula bar exactly as shown above (everything after the `=`).
-3. Press **Enter**.
-4. With the measure selected in the Data pane, use the **Measure tools** contextual ribbon tab → **Formatting** group to set the format string shown in the table above.
